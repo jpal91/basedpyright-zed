@@ -1,4 +1,5 @@
-use zed_extension_api::{self as zed, settings::LspSettings};
+use std::path::PathBuf;
+use zed_extension_api::{self as zed, serde_json::Value, settings::LspSettings};
 
 struct BasedPyright;
 
@@ -13,7 +14,7 @@ impl zed::Extension for BasedPyright {
     ) -> zed_extension_api::Result<zed_extension_api::Command> {
         let env = worktree.shell_env();
 
-        if let Ok(lsp_settings) = LspSettings::for_worktree("basedpyright", worktree) {
+        if let Ok(lsp_settings) = LspSettings::for_worktree("basedpyright-alt", worktree) {
             if let Some(binary) = lsp_settings.binary {
                 if let Some(path) = binary.path {
                     let args = binary.arguments.unwrap_or(vec!["--stdio".to_string()]);
@@ -32,7 +33,7 @@ impl zed::Extension for BasedPyright {
         Ok(zed::Command {
             command: path,
             args: vec!["--stdio".to_string(), Default::default()],
-            env: env,
+            env,
         })
     }
     // ref https://github.com/zed-industries/zed/blob/main/extensions/ruff/src/ruff.rs
@@ -52,12 +53,34 @@ impl zed::Extension for BasedPyright {
         language_server_id: &zed_extension_api::LanguageServerId,
         worktree: &zed_extension_api::Worktree,
     ) -> zed_extension_api::Result<Option<zed_extension_api::serde_json::Value>> {
-        let settings = LspSettings::for_worktree(language_server_id.as_ref(), worktree)
+        let mut settings = LspSettings::for_worktree(language_server_id.as_ref(), worktree)
             .ok()
             .and_then(|lsp_settings| lsp_settings.settings.clone())
             .unwrap_or_default();
+
+        settings = update_python_path(settings, worktree.root_path())?;
         Ok(Some(settings))
     }
+}
+
+fn update_python_path(mut settings: Value, root: String) -> zed_extension_api::Result<Value> {
+    if let Some(python) = settings.get_mut("python") {
+        if let Some(python_path) = python.get_mut("pythonPath") {
+            let ppath_str = python_path
+                .as_str()
+                .ok_or("Could not parse pythonPath to a valid string. Please ensure pythonPath is a string".to_string())?;
+            let venv_path = PathBuf::from_iter([&root, ppath_str]);
+
+            if venv_path.exists() {
+                *python_path = venv_path
+                    .to_str()
+                    .ok_or(format!("Could not parse path {venv_path:?} for pythonPath"))?
+                    .into();
+            }
+        }
+    }
+
+    Ok(settings)
 }
 
 zed::register_extension!(BasedPyright);

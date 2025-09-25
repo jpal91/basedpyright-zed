@@ -1,11 +1,11 @@
-id = "basedpyright"
-name = "BasedPyright"
+id = "basedpyright-alt"
+name = "BasedPyright Alt"
 description = "Python type checking and language server support from BasedPyright."
 version = "0.1.3"
 schema_version = 1
-authors = ["Jose Miguel <miguelpintojose00@gmail.com>"]
-repository = "https://github.com/pub-struct/basedpyright-zed"
+authors = ["Justin Pallansch <pallanschja@gmail.com>"]
+repository = "https://github.com/jpal91/basedpyright-zed"
 
-[language_servers.basedpyright]
-name = "BasedPyright"
+[language_servers.basedpyright-alt]
+name = "BasedPyright Alt"
 languages = ["Python"]

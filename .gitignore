@@ -22,3 +22,5 @@ grammars/
 
 # Don't upload the built extension from development
 extension.wasm
+
+test_python.py
