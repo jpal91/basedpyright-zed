@@ -64,7 +64,6 @@ impl zed::Extension for BasedPyright {
 }
 
 fn update_python_path(mut settings: Value, root: String) -> zed_extension_api::Result<Value> {
-    let mut debug: Option<Value> = None;
     if let Some(python) = settings.get_mut("python") {
         if let Some(python_path) = python.get_mut("pythonPath") {
             let ppath_str = python_path
@@ -72,18 +71,12 @@ fn update_python_path(mut settings: Value, root: String) -> zed_extension_api::R
                 .ok_or_else(|| "Could not parse pythonPath to a valid string. Please ensure pythonPath is a string".to_string())?;
             let venv_path = PathBuf::from_iter([&root, ppath_str]);
 
-            debug = Some(PathBuf::from(&root).join(".venv").to_str().into());
-
-            if venv_path.exists() || PathBuf::from(&root).join(".venv").exists() {
-                *python_path = venv_path
-                    .to_str()
-                    .ok_or_else(|| format!("Could not parse path {venv_path:?} for pythonPath"))?
-                    .into();
-            }
+            *python_path = venv_path
+                .to_str()
+                .ok_or_else(|| format!("Could not parse path {venv_path:?} for pythonPath"))?
+                .into();
         }
     }
-
-    settings["debug"] = debug.into();
 
     Ok(settings)
 }

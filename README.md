@@ -92,10 +92,6 @@ When `basedpyright` looks for the `.venv` it will always be there!
 
 I spent about 4-5 hours trying to figure out how to get this to work correctly. I couldn't find anything on issues, the web, or anywhere else on how to make `basedpyright` work consistently in a workspace. If you've figured it out, **PLEASE** for the love of everything message me and let me know how to do it so I can get rid of this extension.
 
-#### Was It Necessary To Write a Long `README` Just For This?
-
-I spent that much time trying to not re-invent the wheel, only to give in and re-invent the wheel. I may as well take 15 mins to justify myself.
-
 <br/>
 
 Below are is the remainder of the original `README` (with `alt` added). Enjoy!
